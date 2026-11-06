@@ -1,0 +1,50 @@
+name: checks
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_USER: punting
+          POSTGRES_DB: punting
+          # Ephemeral CI service only. Production secrets are generated separately.
+          POSTGRES_PASSWORD: ci-only-not-for-production
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U punting -d punting"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://punting:ci-only-not-for-production@127.0.0.1:5432/punting
+      TEST_DATABASE_URL: postgresql+psycopg://punting:ci-only-not-for-production@127.0.0.1:5432/punting
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.lock
+      - name: Install frozen dependencies and project
+        run: |
+          python -m pip install --require-hashes -r requirements-dev.lock
+          python -m pip install --no-deps --no-build-isolation -e .
+      - name: Lint
+        run: ruff check src tests deploy scripts
+      - name: Migrate empty PostgreSQL and verify repeat upgrade
+        run: |
+          alembic upgrade head
+          alembic upgrade head
+          alembic current
+      - name: Unit, API and PostgreSQL integration tests
+        run: pytest -q
+      - name: Build non-root application image
+        run: docker build --tag punting-warehouse:ci .

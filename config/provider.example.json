@@ -1,0 +1,212 @@
+{
+  "_notice": "UNVERIFIED TEMPLATE. Endpoint paths are placeholders and field mappings below target the synthetic canonical envelope, NOT a claimed Punting Form response schema. Replace paths, query names, authentication and field paths using your current Professional-tier contract before live ingestion.",
+  "_mapping_help": "Dot paths traverse object keys. Each node selects an object or list with path. Child collections may be absent by default; set optional=false to fail when absent. Fields can use {\"context\":\"date\"}, {\"context\":\"meeting.id\"} or {\"context\":\"race.id\"}. Every source row is retained unchanged as raw_payload. Meeting/race/runner IDs must be stable source identifiers; runner ID must identify a race entry. Missing IDs fail. No geography filtering is performed.",
+  "contract_status": "unverified",
+  "auth": {
+    "location": "query",
+    "name": "REPLACE_WITH_VERIFIED_KEY_PARAMETER"
+  },
+  "max_attempts": 3,
+  "max_retry_delay": 30,
+  "timeout": 30,
+  "endpoints": {
+    "meetings": {
+      "scope": "meeting-list",
+      "path": "/REPLACE_WITH_VERIFIED_MEETING_LIST_PATH",
+      "query": {
+        "REPLACE_WITH_VERIFIED_DATE_PARAMETER": "{date}"
+      },
+      "mapping": {
+        "path": "meetings",
+        "fields": {
+          "id": "id",
+          "date": "date",
+          "track": "track",
+          "state": "state",
+          "rail_position": "rail_position",
+          "track_condition": "track_condition",
+          "moisture_variant": "moisture_variant"
+        },
+        "children": {
+          "races": {
+            "path": "races",
+            "fields": {
+              "id": "id",
+              "number": "number",
+              "distance": "distance",
+              "class_grade": "class_grade",
+              "class_par": "class_par"
+            },
+            "children": {
+              "runners": {
+                "path": "runners",
+                "fields": {
+                  "id": "id",
+                  "horse_name": "horse_name",
+                  "barrier": "barrier",
+                  "weight": "weight",
+                  "trainer": "trainer",
+                  "jockey": "jockey",
+                  "prse": "prse",
+                  "run_style": "run_style",
+                  "kri": "kri",
+                  "cls_diff": "cls_diff",
+                  "fml600": "fml600",
+                  "fml200": "fml200",
+                  "rb": "rb",
+                  "dlr": "dlr",
+                  "finish_position": "finish_position",
+                  "starting_price": "starting_price",
+                  "scratched": "scratched",
+                  "dead_heat_factor": "dead_heat_factor",
+                  "result_status": "result_status"
+                },
+                "children": {
+                  "sectionals": {
+                    "path": "sectionals",
+                    "fields": {
+                      "sequence": "sequence",
+                      "distance": "distance",
+                      "sectional_time": "sectional_time",
+                      "increment": "increment",
+                      "raw_last600": "raw_last600",
+                      "raw_last200": "raw_last200",
+                      "fml600": "fml600",
+                      "fml200": "fml200"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "meeting_details": {
+      "scope": "meeting",
+      "path": "/REPLACE_WITH_VERIFIED_MEETING_DETAIL_PATH/{meeting_id}",
+      "query": {},
+      "mapping": {
+        "path": "meeting",
+        "fields": {
+          "id": "id",
+          "date": "date",
+          "track": "track",
+          "state": "state",
+          "rail_position": "rail_position",
+          "track_condition": "track_condition",
+          "moisture_variant": "moisture_variant"
+        },
+        "children": {
+          "races": {
+            "path": "races",
+            "fields": {
+              "id": "id",
+              "number": "number",
+              "distance": "distance",
+              "class_grade": "class_grade",
+              "class_par": "class_par"
+            },
+            "children": {
+              "runners": {
+                "path": "runners",
+                "fields": {
+                  "id": "id",
+                  "horse_name": "horse_name",
+                  "barrier": "barrier",
+                  "weight": "weight",
+                  "trainer": "trainer",
+                  "jockey": "jockey",
+                  "prse": "prse",
+                  "run_style": "run_style",
+                  "kri": "kri",
+                  "cls_diff": "cls_diff",
+                  "fml600": "fml600",
+                  "fml200": "fml200",
+                  "rb": "rb",
+                  "dlr": "dlr",
+                  "finish_position": "finish_position",
+                  "starting_price": "starting_price",
+                  "scratched": "scratched",
+                  "dead_heat_factor": "dead_heat_factor",
+                  "result_status": "result_status"
+                },
+                "children": {
+                  "sectionals": {
+                    "path": "sectionals",
+                    "fields": {
+                      "sequence": "sequence",
+                      "distance": "distance",
+                      "sectional_time": "sectional_time",
+                      "increment": "increment",
+                      "raw_last600": "raw_last600",
+                      "raw_last200": "raw_last200",
+                      "fml600": "fml600",
+                      "fml200": "fml200"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "race_details": {
+      "scope": "race",
+      "path": "/REPLACE_WITH_VERIFIED_RACE_DETAIL_PATH/{race_id}",
+      "query": {},
+      "mapping": {
+        "path": "race",
+        "fields": {
+          "id": "id",
+          "number": "number",
+          "distance": "distance",
+          "class_grade": "class_grade",
+          "class_par": "class_par"
+        },
+        "children": {
+          "runners": {
+            "path": "runners",
+            "fields": {
+              "id": "id",
+              "horse_name": "horse_name",
+              "barrier": "barrier",
+              "weight": "weight",
+              "trainer": "trainer",
+              "jockey": "jockey",
+              "prse": "prse",
+              "run_style": "run_style",
+              "kri": "kri",
+              "cls_diff": "cls_diff",
+              "fml600": "fml600",
+              "fml200": "fml200",
+              "rb": "rb",
+              "dlr": "dlr",
+              "finish_position": "finish_position",
+              "starting_price": "starting_price",
+              "scratched": "scratched",
+              "dead_heat_factor": "dead_heat_factor",
+              "result_status": "result_status"
+            },
+            "children": {
+              "sectionals": {
+                "path": "sectionals",
+                "fields": {
+                  "sequence": "sequence",
+                  "distance": "distance",
+                  "sectional_time": "sectional_time",
+                  "increment": "increment",
+                  "raw_last600": "raw_last600",
+                  "raw_last200": "raw_last200",
+                  "fml600": "fml600",
+                  "fml200": "fml200"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

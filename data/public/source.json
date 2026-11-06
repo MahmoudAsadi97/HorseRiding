@@ -1,0 +1,26 @@
+{
+  "dataset": "Horse Racing / gdaley/hkracing",
+  "original_url": "https://www.kaggle.com/datasets/gdaley/hkracing",
+  "mirror_repository": "https://github.com/karenwky/Predictive_Modeling_Hong_Kong_Horse_Racing",
+  "mirror_commit": "cae9b0d78bfcc4c98c10bf3533bd90d2257278ca",
+  "license_status": "Original dataset license unverified. Mirror MIT license applies to its software; do not infer a data redistribution license.",
+  "mirror_license_url": "https://github.com/karenwky/Predictive_Modeling_Hong_Kong_Horse_Racing/blob/cae9b0d78bfcc4c98c10bf3533bd90d2257278ca/LICENSE",
+  "provenance_url": "https://github.com/karenwky/Predictive_Modeling_Hong_Kong_Horse_Racing/blob/cae9b0d78bfcc4c98c10bf3533bd90d2257278ca/README.md",
+  "verified_on": "2026-11-05",
+  "date_range": ["1997-06-02", "2005-08-28"],
+  "region": "Hong Kong",
+  "files": {
+    "races.csv": {
+      "url": "https://raw.githubusercontent.com/karenwky/Predictive_Modeling_Hong_Kong_Horse_Racing/cae9b0d78bfcc4c98c10bf3533bd90d2257278ca/data/races.csv",
+      "sha256": "0b97ef70acbe5f09a2d4ed3808824675d539546b26901b7c2c7ae2fa6de8b054",
+      "bytes": 896095,
+      "rows": 6349
+    },
+    "runs.csv": {
+      "url": "https://raw.githubusercontent.com/karenwky/Predictive_Modeling_Hong_Kong_Horse_Racing/cae9b0d78bfcc4c98c10bf3533bd90d2257278ca/data/runs.csv",
+      "sha256": "12bc844ae8a41246adb4d6a765cb2af2b893a277b3bf37464620b2f886e2d590",
+      "bytes": 10564287,
+      "rows": 79447
+    }
+  }
+}

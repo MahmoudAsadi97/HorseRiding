@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="page-intro">
+    <p class="eyebrow">RACING INTELLIGENCE</p>
+    <h1>Your form. A clearer view.</h1>
+    <p class="intro-text">Explore class changes, closing speed and trainer patterns from your racing warehouse.</p>
+  </div>
+
+  <form action="/" method="get" class="filter-panel" aria-label="Filter racing results">
+    <div class="panel-heading"><h2>Build your view</h2><span class="label-muted">Filters apply to this view</span></div>
+    <div class="filter-grid">
+      <label class="wide">Report<select name="report">{% for key, details in reports.items() %}<option value="{{ key }}" {% if key == report %}selected{% endif %}>{{ details[0] }}</option>{% endfor %}</select></label>
+      <label>Region<select name="state">{% for value in ['WA','NSW','VIC','QLD','SA','TAS','NT','ACT','HK','ALL'] %}<option value="{{ value }}" {% if value == filters.state %}selected{% endif %}>{{ 'All regions' if value == 'ALL' else ('Hong Kong (HK)' if value == 'HK' else value) }}</option>{% endfor %}</select></label>
+      <label>Track<input name="track" value="{{ filters.track or '' }}" placeholder="All tracks" maxlength="120"></label>
+      <label>From date<input type="date" name="date_from" value="{{ filters.date_from or '' }}"></label>
+      <label>To date<input type="date" name="date_to" value="{{ filters.date_to or '' }}"></label>
+    </div>
+    <div class="filter-row">
+      <label class="checkbox"><input type="checkbox" name="saturday_only" value="true" {% if filters.saturday_only %}checked{% endif %}>Saturday meetings only</label>
+      <label class="page-size">Rows per page<select name="limit">{% for value in [25,50,100,250,500] %}<option value="{{ value }}" {% if value == filters.limit %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+    </div>
+    <details class="thresholds" {% if report != 'class-droppers' or filters.cls_diff_max != 0 or filters.kri_min != 70 %}open{% endif %}>
+      <summary>Adjust analytical thresholds <span>Class, speed &amp; trainer criteria</span></summary>
+      <div class="threshold-grid">
+        <fieldset><legend>Class droppers</legend>
+          <label>Class change below<input type="number" name="cls_diff_max" value="{{ filters.cls_diff_max }}" min="-1000" max="1000" step="0.01"></label>
+          <label>Minimum KRI<input type="number" name="kri_min" value="{{ filters.kri_min }}" min="0" max="100" step="0.01"></label>
+        </fieldset>
+        <fieldset><legend>Elite closers</legend>
+          <label>Minimum FML200<input type="number" name="fml200_min" value="{{ filters.fml200_min }}" min="-1000" max="1000" step="0.01"></label>
+          <label>Run styles<select multiple name="run_styles" size="4" aria-describedby="style-hint">{% for value in ['Mid-Field','Backmarker','Leader','On-Pace'] %}<option value="{{ value }}" {% if value in filters.run_styles %}selected{% endif %}>{{ value }}</option>{% endfor %}{% for value in filters.run_styles %}{% if value not in ['Mid-Field','Backmarker','Leader','On-Pace'] %}<option selected value="{{ value }}">{{ value }}</option>{% endif %}{% endfor %}</select></label>
+          <small id="style-hint">Select one or more running styles.</small>
+        </fieldset>
+        <fieldset><legend>Trainer patterns</legend>
+          <label>Minimum settled starts<input type="number" name="min_starts" value="{{ filters.min_starts }}" min="1" max="1000000"></label>
+          <label>Maximum backup days<input type="number" name="max_dlr" value="{{ filters.max_dlr }}" min="0" max="365"></label>
+        </fieldset>
+      </div>
+    </details>
+    <div class="form-actions"><p>WA is the default region. Dates are meeting dates, inclusive.</p><a href="/">Reset</a><button type="submit">Apply filters</button></div>
+  </form>
+
+  <section class="results-panel" aria-labelledby="results-title">
+    <div class="results-heading"><div><p class="eyebrow">{{ filters.state if filters.state != 'ALL' else 'ALL REGIONS' }}{% if filters.track %} / {{ filters.track }}{% endif %}</p><h2 id="results-title">{{ reports[report][0] }}</h2><p>{{ reports[report][1] }}</p></div><div class="count"><strong>{{ result.total }}</strong><span>{{ 'trainers' if report in ['first-up','backup'] else 'runners' }} match</span></div></div>
+    {% if result['items'] %}
+      <div class="table-scroll" role="region" aria-label="{{ reports[report][0] }} results" tabindex="0">
+      {% if report in ['first-up','backup'] %}
+        <table><caption class="sr-only">Trainer results; percentages use the denominators shown.</caption><thead><tr><th scope="col">Trainer</th><th scope="col">Starts</th><th scope="col">Wins</th><th scope="col">Strike %</th><th scope="col">Priced starts</th><th scope="col">Unpriced starts</th><th scope="col">Priced wins</th><th scope="col">Return units</th><th scope="col">Profit units</th><th scope="col">ROI %</th></tr></thead><tbody>
+        {% for row in result['items'] %}<tr><th scope="row">{{ row.trainer }}</th><td>{{ row.starts }}</td><td>{{ row.wins }}</td><td>{{ row.strike_rate_pct|display }}</td><td>{{ row.priced_starts }}</td><td>{{ row.unpriced_starts }}</td><td>{{ row.priced_wins }}</td><td>{{ row.return_units|display }}</td><td>{{ row.profit_units|display }}</td><td class="metric">{{ row.roi_pct|display }}</td></tr>{% endfor %}
+        </tbody></table>
+      {% else %}
+        <table><caption class="sr-only">Qualifying race entries and their recorded analytical variables.</caption><thead><tr><th scope="col">Horse / trainer</th><th scope="col">Meeting</th><th scope="col">Race</th><th scope="col">Class Δ</th><th scope="col">KRI</th><th scope="col">FML200</th><th scope="col">FML600</th><th scope="col">Run style</th><th scope="col">RB</th><th scope="col">DLR</th><th scope="col">Sectionals</th></tr></thead><tbody>
+        {% for row in result['items'] %}<tr><th scope="row">{{ row.horse_name }}{% if row.scratched %}<span class="badge">Scratched</span>{% endif %}<small>{{ row.trainer or 'Trainer unavailable' }}</small></th><td>{{ row.track }}<small>{{ row.meeting_date }}</small></td><td><span class="race-number">R{{ row.race_number }}</span><small>{{ row.distance|display }} m</small></td><td>{{ row.cls_diff|display }}</td><td>{{ row.kri|display }}</td><td class="metric">{{ row.fml200|display }}</td><td>{{ row.fml600|display }}</td><td>{{ row.run_style or '—' }}</td><td>{{ row.rb|display }}</td><td>{{ row.dlr|display }}</td><td><a class="row-link" href="{{ url_for('sectional_page', runner_id=row.id) }}?state={{ filters.state }}">View<span class="sr-only"> {{ row.horse_name }} sectionals</span></a></td></tr>{% endfor %}
+        </tbody></table>
+      {% endif %}
+      </div>
+    {% else %}
+      <div class="empty-state"><span aria-hidden="true">◎</span><h3>No matching records</h3><p>Try a broader date range or adjust the filters. Results appear after feeds are ingested.</p></div>
+    {% endif %}
+    <div class="pagination"><p>{% if result['items'] %}Showing {{ result.offset + 1 }}–{{ result.offset + result['items']|length }} of {{ result.total }}{% else %}0 rows shown{% endif %}</p><nav aria-label="Results pages">{% if links.previous %}<a href="{{ links.previous }}">← Previous</a>{% endif %}{% if links.next %}<a href="{{ links.next }}">Next →</a>{% endif %}</nav></div>
+  </section>
+  {% if filters.state == 'HK' %}<p class="data-note">Hong Kong historical records use source identifiers for horses and trainers. Proprietary KRI, class-change and FML metrics may be unavailable; those records do not qualify for the class or closer scanners. Backup days describe the preceding observed start in the imported history.</p>{% endif %}
+  {% if result.methodology %}<aside class="methodology"><h2>Read the denominators</h2><p>{{ result.methodology.starts }}</p><p>{{ result.methodology.strike_rate }}</p><p>{{ result.methodology.roi }}</p></aside>{% else %}<p class="data-note">— means the value was not recorded. Missing analytical values do not qualify for the corresponding filter. Scratched entries are labelled.</p>{% endif %}
+{% endblock %}

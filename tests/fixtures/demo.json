@@ -1,0 +1,29 @@
+{
+  "_notice": "SYNTHETIC DEMONSTRATION DATA. This canonical envelope is not a verified Punting Form response schema. All people and horses are fictional.",
+  "meetings": [
+    {
+      "id": "demo-wa-20261031", "date": "2026-10-31", "track": "Ascot", "state": "WA",
+      "rail_position": "True", "track_condition": "Good 4", "moisture_variant": 0.2,
+      "races": [
+        {"id": "demo-wa-r1", "number": 1, "distance": 1200, "class_grade": "Synthetic Benchmark 64", "class_par": 70.1,
+          "runners": [
+            {"id": "demo-wa-r1-h1", "horse_name": "Demo Western Comet", "barrier": 3, "weight": 57.5, "trainer": "Demo Trainer West", "jockey": "Demo Rider A", "prse": 7, "run_style": "Backmarker", "kri": 75, "cls_diff": -2, "fml600": 3.1, "fml200": 2.8, "rb": 0, "dlr": 6, "finish_position": 1, "starting_price": 4.0, "scratched": false, "dead_heat_factor": 1, "result_status": "finished",
+              "sectionals": [
+                {"sequence": 1, "distance": 200, "sectional_time": 13.1, "increment": 0.1, "raw_last600": 34.8, "raw_last200": 11.3, "fml600": 3.1, "fml200": 2.8},
+                {"sequence": 2, "distance": 400, "sectional_time": 12.0, "increment": -0.1},
+                {"sequence": 3, "distance": 600, "sectional_time": 11.8, "increment": 0.0},
+                {"sequence": 4, "distance": 800, "sectional_time": 11.8, "increment": 0.2},
+                {"sequence": 5, "distance": 1000, "sectional_time": 11.7, "increment": -0.2},
+                {"sequence": 6, "distance": 1200, "sectional_time": 11.3, "increment": -0.4, "raw_last600": 34.8, "raw_last200": 11.3, "fml600": 3.1, "fml200": 2.8}
+              ]},
+            {"id": "demo-wa-r1-h2", "horse_name": "Demo Boundary Star", "barrier": 5, "weight": 56, "trainer": "Demo Trainer West", "jockey": "Demo Rider B", "prse": 5, "run_style": "Mid-Field", "kri": 70, "cls_diff": -0.5, "fml600": 2, "fml200": 2.5, "rb": 0, "dlr": 7, "finish_position": 2, "starting_price": 5.0, "scratched": false, "result_status": "finished"},
+            {"id": "demo-wa-r1-h3", "horse_name": "Demo Front Runner", "barrier": 1, "weight": 58, "trainer": "Demo Trainer Coast", "run_style": "Leader", "kri": 69.9, "cls_diff": 0, "fml200": 3, "rb": 1, "dlr": 8, "finish_position": 3, "starting_price": 2.5, "scratched": false, "result_status": "finished"},
+            {"id": "demo-wa-r1-h4", "horse_name": "Demo Scratched", "trainer": "Demo Trainer Coast", "rb": 0, "dlr": 4, "scratched": true, "result_status": "pending"}
+          ]}
+      ]
+    },
+    {"id": "demo-vic-20261031", "date": "2026-10-31", "track": "Flemington", "state": "VIC", "track_condition": "Good 4",
+      "races": [{"id": "demo-vic-r1", "number": 1, "distance": 1000,
+        "runners": [{"id": "demo-vic-r1-h1", "horse_name": "Demo Eastern Meteor", "trainer": "Demo Trainer East", "run_style": "Backmarker", "kri": 90, "cls_diff": -3, "fml200": 4, "rb": 0, "dlr": 6, "finish_position": 1, "starting_price": 3.0, "scratched": false, "result_status": "finished"}]}]}
+  ]
+}

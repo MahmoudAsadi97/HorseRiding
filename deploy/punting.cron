@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+PATH=/usr/local/bin:/usr/bin:/bin
+# /etc/localtime is Australia/Perth. Debian cron uses this system timezone.
+15 5 * * * root /usr/local/bin/python /app/deploy/scheduler.py --run >> /proc/1/fd/1 2>> /proc/1/fd/2
+

@@ -1,0 +1,110 @@
+name: ${COMPOSE_PROJECT_NAME:-punting}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-app-environment: &app-environment
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-punting}:${POSTGRES_PASSWORD:?Run scripts/init-env.py first}@postgres:5432/${POSTGRES_DB:-punting}
+  API_TOKEN: ${API_TOKEN:?Run scripts/init-env.py first}
+  ADMIN_USERNAME: ${ADMIN_USERNAME:-analyst}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Run scripts/init-env.py first}
+  PROVIDER_BASE_URL: ${PROVIDER_BASE_URL:-https://api.puntingform.com.au}
+  PROVIDER_CONFIG_PATH: ${PROVIDER_CONFIG_PATH:-/app/config/provider.json}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  TZ: Australia/Perth
+
+services:
+  postgres:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-punting}
+      POSTGRES_USER: ${POSTGRES_USER:-punting}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/init-env.py first}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [backend]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging: *logging
+
+  app:
+    image: punting-warehouse:${APP_IMAGE_TAG:-local}
+    build: .
+    restart: unless-stopped
+    environment: *app-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [backend]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/health/ready", timeout=3)']
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+    logging: *logging
+
+  gateway:
+    image: caddy:2-alpine
+    profiles: [public]
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [backend, egress]
+    logging: *logging
+
+  scheduler:
+    image: punting-warehouse:${APP_IMAGE_TAG:-local}
+    profiles: [ingest]
+    restart: unless-stopped
+    # Debian cron needs root; scheduler.py drops to UID/GID 10001 for ingestion.
+    user: "0:0"
+    entrypoint: [python, /app/deploy/scheduler.py]
+    command: []
+    environment:
+      <<: *app-environment
+      PUNTING_FORM_API_KEY: ${PUNTING_FORM_API_KEY:-}
+      INGEST_LOOKBACK_DAYS: ${INGEST_LOOKBACK_DAYS:-7}
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [backend, egress]
+    read_only: true
+    tmpfs: [/run, /tmp]
+    cap_drop: [ALL]
+    cap_add: [SETUID, SETGID]
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+
+networks:
+  backend:
+    internal: true
+  egress:
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

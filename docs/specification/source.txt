@@ -1,0 +1,155 @@
+Project Specification: Custom Sports
+Analytics Database & API
+Prepared for: Independent Software Engineer / Contractor
+
+Data Source Backend: Punting Form Public API V2 (Professional Tier)
+
+Primary Filter Focus: Western Australian (WA) Racing (with initial emphasis on Saturday Ascot
+Meetings)
+
+
+  Architectural Core Directive: "Store Everything, Filter Later"
+  The database must be built as a raw data warehouse. The ingestion pipeline must capture and
+  store complete, unedited row payloads from the Punting Form API endpoints. Changing or
+  adding filtering logic down the track must only require modifying the view/API layer, completely
+  preserving the underlying data architecture.
+
+
+
+1. Scope of Work & Target Deliverables
+
+ • Daily ETL Ingestion Pipeline: An automated Python script running via cron job that
+   authenticates against Punting Form V2 API, checks for target meetings (e.g., Saturday Ascot), and
+   processes raw fields into a local warehouse.
+ • Relational Database: A optimized PostgreSQL instance designed to map structured racing
+   entities and rapidly index sequential fractional data.
+ • Lightweight API Layer: A secure REST API built using FastAPI or Flask to expose modular,
+   parameterised endpoints for automated form filtering.
+ • Cross-Device User Interface: Responsive HTML table outputs or automated text webhooks
+   (e.g., Telegram Bot) to allow secure remote access via any smartphone or computer.
+
+
+2. Database Entity & Schema Requirements
+
+The database schema must separate data into clean relational tables to handle sequential
+parameters efficiently:
+
+ • meetings : Tracks static daily parameters: Date, Track Name, Rail Position, Track Condition, and
+   Moisture Variant.
+ • races : Tracks Race Number, Distance, Class Grade, and Class Par values.
+ • runners : Tracks Horse Name, Barrier, Weight, Trainer, Jockey, Predicted Settle ( PrSe ), Run
+   Style ( RunStyle ), and Key Race Index ( KRI ).
+
+
+
+
+                                                                                              Page 1 of 3
+ • sectionals_200m : A sequential table mapping every individual 200m chunk run by every horse.
+   Must record Sectional Increments, Sectional Time, Raw Last 600m/200m, and the Tempo-
+   Adjusted Benchmark Variables.
+
+
+3. Crucial Analytical Variable Mappings
+
+                           API Backend
+ Web Interface Term                                  Database Function & Purpose
+                           Variable
+
+                                                     Calculates subsequent form lines on a scale of
+ Key Race Index             KRI
+                                                     0-100. Measures race strength.
+
+                                                     Tracks numeric class drops (negative value) or
+ Class Change / Diff        ClsDiff
+                                                     rises (positive value).
+
+                                                     Fastest Meantime Lengths for last 600m. Tempo-
+ Var L 600 (L600)           FML600
+                                                     adjusted efficiency rating.
+
+                                                     Fastest Meantime Lengths for final 200m.
+ Var L 200 (L200)           FML200
+                                                     Identifies peak terminal sprint velocity.
+
+                                                     Preparation counter. 0 signifies first-up from a
+ Runs Back                  RB
+                                                     spell, 1 signifies second-up.
+
+                                                     Tracks the exact space between starts to
+ Days Since Last Run        DLR
+                                                     evaluate fitness cycles and quick backups.
+
+
+
+4. Custom Algorithmic Filtering Rules
+
+The developer must write modular endpoints that allow dynamic parameter passing. The core filters
+required for day-one deployment include:
+
+A. The Automated Class Dropper & Hot Form Scanner
+Isolates runners stepping down significantly in competitive grade who competed in high-pressure
+historical fields.
+
+
+  # Target Logic Sample
+  system_bets = df[(df['ClsDiff'] < 0) & (df['KRI'] >= 70)]
+
+
+B. The Elite Closing Sectional Matrix
+Isolates backmarkers or mid-fielders who clocked elite finishing terminal velocity lengths (FML)
+regardless of whether they won or missed a place visually.
+
+
+
+
+                                                                                                 Page 2 of 3
+  # Target Logic Sample
+  elite_closers = df[(df['FML200'] >= 2.5) & (df['RunStyle'].isin(['Mid-Field',
+  'Backmarker']))]
+
+
+C. Custom Dynamic Trainer Strike Rates
+The system must query historical warehouse entries to aggregate custom trainer trends dynamically
+based on current parameters:
+
+ • 1st-Up Pattern: Group by Trainer where RB == 0 to evaluate fresh-up success percentages.
+ • The 7-Day Backup: Group by Trainer where DLR <= 7 to expose trainers with high ROI when
+   running horses on tight backup schedules.
+
+
+5. Project Delivery & Payment Milestones
+
+To protect project budget and ensure compliance with Punting Form API structures, payments should
+be broken down across the following four clear milestones:
+
+ Milestone      Delivery Target                                       Verification Requirement
+
+                                                                      Successful data dump of
+                API Connection & PostgreSQL Ingestion Pipeline
+ Milestone 1                                                          target raw JSON/CSV feeds
+                Script completed.
+                                                                      into database local tables.
+
+                                                                      Successful indexing of
+                Database Architecture & Sectional/Variable Table      sequential 200m tables with
+ Milestone 2
+                Schema optimization.                                  filter targets limited to WA
+                                                                      tracks.
+
+                                                                      Successful live query test
+                API Layer Development (FastAPI/Flask) with custom     returning correct Class
+ Milestone 3
+                parameter filtering.                                  Dropper and FML data
+                                                                      arrays.
+
+                                                                      System accessible securely
+                Cloud Server Deployment, Secure Authentication        via mobile browser/link with
+ Milestone 4
+                setup, and ReadMe handover.                           functional HTML data
+                                                                      layout.
+
+
+
+
+                                                                                             Page 3 of 3
+

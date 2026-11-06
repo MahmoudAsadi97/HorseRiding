@@ -1,0 +1,8 @@
+# Loopback-only HTTP for synthetic smoke tests. Start postgres and app explicitly.
+services:
+  app:
+    # Docker does not publish ports for a container attached only to internal
+    # networks. This extra local-test network enables the loopback publication.
+    networks: [backend, egress]
+    ports:
+      - "127.0.0.1:${LOCAL_PORT:-8000}:8000"

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}Punting Warehouse{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to results</a>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="Punting Warehouse home"><span class="brand-icon" aria-hidden="true">P</span><span>PUNTING<span class="brand-subtitle">WAREHOUSE</span></span></a>
+    <div class="header-note"><span class="status-dot" aria-hidden="true"></span>Private research desk</div>
+  </header>
+  <main id="main">{% block content %}{% endblock %}</main>
+  <footer>Historical form research · Data completeness depends on recorded feeds. No prediction of future returns.</footer>
+</body>
+</html>

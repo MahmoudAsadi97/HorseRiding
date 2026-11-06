@@ -1,0 +1,14 @@
+# Use only where HTTPS egress requires a managed proxy CA bundle.
+services:
+  app:
+    build:
+      context: .
+      secrets: [proxy_ca]
+  scheduler:
+    environment:
+      SSL_CERT_FILE: /run/proxy-ca.pem
+    volumes:
+      - ${PROXY_CA_FILE:?Set PROXY_CA_FILE to a combined CA bundle}:/run/proxy-ca.pem:ro
+secrets:
+  proxy_ca:
+    file: ${PROXY_CA_FILE:?Set PROXY_CA_FILE to a combined CA bundle}
